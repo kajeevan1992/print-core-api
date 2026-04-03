@@ -6,14 +6,8 @@ import { productCreateSchema, productUpdateSchema } from './products.schema';
 type ProductCreateInput = z.infer<typeof productCreateSchema>;
 type ProductUpdateInput = z.infer<typeof productUpdateSchema>;
 
-export async function listProducts(params: {
-  page: number;
-  limit: number;
-  search?: string;
-  status?: 'published' | 'draft';
-  channelId?: string;
-}) {
-  const { page, limit, search, status, channelId } = params;
+export async function listProducts(params: { page: number; limit: number; search?: string; status?: 'published' | 'draft' }) {
+  const { page, limit, search, status } = params;
   const skip = (page - 1) * limit;
 
   const where: Prisma.ProductWhereInput = {
@@ -25,16 +19,7 @@ export async function listProducts(params: {
           ]
         }
       : {}),
-    ...(status ? { published: status === 'published' } : {}),
-    ...(channelId
-      ? {
-          channels: {
-            some: {
-              channelId
-            }
-          }
-        }
-      : {})
+    ...(status ? { published: status === 'published' } : {})
   };
 
   const [items, total] = await prisma.$transaction([
@@ -59,37 +44,21 @@ export async function listProducts(params: {
   };
 }
 
-export async function getProductById(id: string, channelId?: string) {
-  return prisma.product.findFirst({
-    where: {
-      id,
-      ...(channelId
-        ? {
-            channels: {
-              some: {
-                channelId
-              }
-            }
-          }
-        : {})
-    },
+export async function getProductById(id: string) {
+  return prisma.product.findUnique({
+    where: { id },
     include: { channels: true }
   });
 }
 
-export async function createProduct(input: ProductCreateInput, channelId?: string) {
+export async function createProduct(input: ProductCreateInput) {
   const { channelIds, ...data } = input;
-
-  const linkedChannelIds = channelId
-    ? Array.from(new Set([channelId, ...(channelIds ?? [])]))
-    : (channelIds ?? []);
-
   return prisma.product.create({
     data: {
       ...data,
       channels: {
-        create: linkedChannelIds.map((linkedChannelId) => ({
-          channel: { connect: { id: linkedChannelId } }
+        create: channelIds.map((channelId) => ({
+          channel: { connect: { id: channelId } }
         }))
       }
     },
@@ -97,21 +66,8 @@ export async function createProduct(input: ProductCreateInput, channelId?: strin
   });
 }
 
-export async function updateProduct(id: string, input: ProductUpdateInput, channelId?: string) {
-  const existingProduct = await prisma.product.findFirst({
-    where: {
-      id,
-      ...(channelId
-        ? {
-            channels: {
-              some: {
-                channelId
-              }
-            }
-          }
-        : {})
-    }
-  });
+export async function updateProduct(id: string, input: ProductUpdateInput) {
+  const existingProduct = await prisma.product.findUnique({ where: { id } });
 
   if (!existingProduct) {
     return null;
@@ -119,20 +75,16 @@ export async function updateProduct(id: string, input: ProductUpdateInput, chann
 
   const { channelIds, ...data } = input;
 
-  const linkedChannelIds = channelId
-    ? Array.from(new Set([channelId, ...(channelIds ?? [])]))
-    : channelIds;
-
   return prisma.product.update({
     where: { id },
     data: {
       ...data,
-      ...(linkedChannelIds
+      ...(channelIds
         ? {
             channels: {
               deleteMany: {},
-              create: linkedChannelIds.map((linkedChannelId) => ({
-                channel: { connect: { id: linkedChannelId } }
+              create: channelIds.map((channelId) => ({
+                channel: { connect: { id: channelId } }
               }))
             }
           }

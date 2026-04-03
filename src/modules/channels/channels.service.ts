@@ -11,14 +11,8 @@ function generateApiKey(prefix: string): string {
   return `${prefix}_${randomBytes(24).toString('hex')}`;
 }
 
-export async function listChannels(params: {
-  page: number;
-  limit: number;
-  search?: string;
-  status?: string;
-  scopedChannelId?: string;
-}) {
-  const { page, limit, search, status, scopedChannelId } = params;
+export async function listChannels(params: { page: number; limit: number; search?: string; status?: string }) {
+  const { page, limit, search, status } = params;
   const skip = (page - 1) * limit;
 
   const where: Prisma.ChannelWhereInput = {
@@ -31,8 +25,7 @@ export async function listChannels(params: {
           ]
         }
       : {}),
-    ...(status ? { status } : {}),
-    ...(scopedChannelId ? { id: scopedChannelId } : {})
+    ...(status ? { status } : {})
   };
 
   const [items, total] = await prisma.$transaction([
@@ -57,11 +50,7 @@ export async function listChannels(params: {
   };
 }
 
-export async function getChannelById(id: string, scopedChannelId?: string) {
-  if (scopedChannelId && scopedChannelId !== id) {
-    return null;
-  }
-
+export async function getChannelById(id: string) {
   return prisma.channel.findUnique({
     where: { id },
     include: { theme: true }
@@ -79,14 +68,8 @@ export async function createChannel(input: ChannelCreateInput) {
   });
 }
 
-export async function updateChannel(id: string, input: ChannelUpdateInput, scopedChannelId?: string) {
-  if (scopedChannelId && scopedChannelId !== id) {
-    return null;
-  }
-
-  const existingChannel = await prisma.channel.findUnique({
-    where: { id }
-  });
+export async function updateChannel(id: string, input: ChannelUpdateInput) {
+  const existingChannel = await prisma.channel.findUnique({ where: { id } });
 
   if (!existingChannel) {
     return null;

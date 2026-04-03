@@ -5,7 +5,6 @@ import { channelsRouter } from './modules/channels/channels.routes';
 import { themesRouter } from './modules/themes/themes.routes';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { env } from './config/env';
-import { channelResolver } from './middleware/channel-resolver';
 
 export const app = express();
 
@@ -15,7 +14,6 @@ const corsOrigin = env.CORS_ORIGIN
 
 app.use(cors({ origin: corsOrigin }));
 app.use(express.json());
-app.use(channelResolver);
 
 app.get('/', (_req, res) => {
   res.json({
