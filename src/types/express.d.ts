@@ -1,9 +1,9 @@
-import type { ZodError } from 'zod';
+import { Channel } from '@prisma/client';
 
 declare global {
   namespace Express {
     interface Request {
-      validationError?: ZodError;
+      channel?: Channel | null;
     }
   }
 }
