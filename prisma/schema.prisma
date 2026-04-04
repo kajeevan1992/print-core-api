@@ -9,18 +9,45 @@ datasource db {
 }
 
 model Product {
-  id           String           @id @default(cuid())
-  name         String
-  slug         String           @unique
-  description  String?
-  productType  String
-  categoryId   String
-  vendorId     String
-  isGlobal     Boolean          @default(false)
-  published    Boolean          @default(false)
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
-  channels     ProductChannel[]
+  id              String              @id @default(cuid())
+  name            String
+  slug            String              @unique
+  description     String?
+  creationMethod  String              @default("blank")
+  productType     String
+  categoryId      String?
+  vendorId        String              @default("")
+  hotFolder       String              @default("")
+  pdfFileUrl      String?
+  cmsPageLink     String              @default("")
+  previewUrl      String              @default("")
+  thumbnail       String              @default("")
+  sortOrder       Int                 @default(0)
+  pages           Int                 @default(1)
+  units           String              @default("mm")
+  width           Float               @default(0)
+  height          Float               @default(0)
+  bleed           Float               @default(0)
+  isGlobal        Boolean             @default(false)
+  published       Boolean             @default(false)
+  storefrontIds   Json?
+  lastSavedAt     DateTime?
+  productNumbers  Json?
+  templateDefaults Json?
+  templateSetup   Json?
+  templateAssets  Json?
+  priceMapping    Json?
+  comments        Json?
+  internalNotes   String              @default("")
+  inventory       Json?
+  relatedProducts Json?
+  attributes      Json?
+  alternateViews  Json?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  channels        ProductChannel[]
+  productTags     ProductTagMap[]
+  collectionItems CollectionProduct[]
 }
 
 model Channel {
@@ -50,6 +77,103 @@ model Theme {
   author      String
   createdAt   DateTime  @default(now())
   channels    Channel[]
+}
+
+model Category {
+  id                 String                @id @default(cuid())
+  name               String
+  description        String                @default("")
+  parentId           String?
+  parent             Category?             @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children           Category[]            @relation("CategoryHierarchy")
+  pricingId          String                @default("")
+  attributeSetId     String                @default("")
+  published          Boolean               @default(true)
+  thumbnail          String                @default("")
+  friendlyUrl        String                @unique
+  sortOrder          Int                   @default(0)
+  accuZipConfig      String                @default("")
+  useAlternateMaster Boolean               @default(false)
+  canBrowse          Boolean               @default(true)
+  canUpload          Boolean               @default(false)
+  canUploadLater     Boolean               @default(false)
+  canCreate          Boolean               @default(true)
+  canCustom          Boolean               @default(true)
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  categoryTags       CategoryTagMap[]
+  collections        CollectionCategory[]
+
+  @@index([parentId])
+  @@index([published])
+}
+
+model CategoryTag {
+  id          String           @id @default(cuid())
+  label       String           @unique
+  createdAt   DateTime         @default(now())
+  categories  CategoryTagMap[]
+}
+
+model CategoryTagMap {
+  categoryId String
+  tagId      String
+  category   Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  tag        CategoryTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([categoryId, tagId])
+}
+
+model Tag {
+  id         String          @id @default(cuid())
+  name       String
+  parentId   String?
+  parent     Tag?            @relation("TagHierarchy", fields: [parentId], references: [id])
+  children   Tag[]           @relation("TagHierarchy")
+  friendlyUrl String         @unique
+  published  Boolean         @default(false)
+  sidebar    Boolean         @default(false)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  productTags ProductTagMap[]
+
+  @@index([parentId])
+}
+
+model ProductTagMap {
+  productId String
+  tagId     String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([productId, tagId])
+}
+
+model Collection {
+  id         String               @id @default(cuid())
+  title      String               @unique
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  products   CollectionProduct[]
+  categories CollectionCategory[]
+}
+
+model CollectionProduct {
+  collectionId String
+  productId    String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, productId])
+}
+
+model CollectionCategory {
+  collectionId String
+  categoryId   String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  category     Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, categoryId])
 }
 
 model ProductChannel {

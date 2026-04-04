@@ -3,26 +3,21 @@ import cors from 'cors';
 import { productsRouter } from './modules/products/products.routes';
 import { channelsRouter } from './modules/channels/channels.routes';
 import { themesRouter } from './modules/themes/themes.routes';
+import { categoriesRouter } from './modules/categories/categories.routes';
+import { collectionsRouter } from './modules/collections/collections.routes';
+import { tagsRouter } from './modules/tags/tags.routes';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { env } from './config/env';
 
 export const app = express();
 
-const corsOrigin = env.CORS_ORIGIN
-  ? env.CORS_ORIGIN.split(',').map((origin) => origin.trim())
-  : true;
+const corsOrigin = env.CORS_ORIGIN ? env.CORS_ORIGIN.split(',').map((origin) => origin.trim()) : true;
 
 app.use(cors({ origin: corsOrigin }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 app.get('/', (_req, res) => {
-  res.json({
-    success: true,
-    data: {
-      name: 'print-core-api',
-      status: 'ok'
-    }
-  });
+  res.json({ success: true, data: { name: 'print-core-api', status: 'ok' } });
 });
 
 app.get('/health', (_req, res) => {
@@ -32,6 +27,9 @@ app.get('/health', (_req, res) => {
 app.use('/products', productsRouter);
 app.use('/channels', channelsRouter);
 app.use('/themes', themesRouter);
+app.use('/categories', categoriesRouter);
+app.use('/collections', collectionsRouter);
+app.use('/tags', tagsRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

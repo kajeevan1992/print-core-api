@@ -1,0 +1,13 @@
+import { prisma } from '../../lib/prisma';
+import { z } from 'zod';
+import { collectionSchema, collectionUpdateSchema } from './collections.schema';
+
+type CollectionInput = z.infer<typeof collectionSchema>;
+type CollectionUpdateInput = z.infer<typeof collectionUpdateSchema>;
+const includeCollection = { products: { include: { product: true } }, categories: { include: { category: true } } } as const;
+const mapCollection = (item: any) => ({ id: item.id, title: item.title, createdOn: item.createdAt.toISOString().slice(0,10), productIds: item.products.map((entry: any) => entry.productId), categoryIds: item.categories.map((entry: any) => entry.categoryId), products: item.products.map((entry: any) => entry.product), categories: item.categories.map((entry: any) => entry.category) });
+export async function listCollections(params: { page: number; limit: number; search?: string }) { const where = params.search ? { title: { contains: params.search, mode: 'insensitive' as const } } : {}; const items = await prisma.collection.findMany({ where, include: includeCollection, orderBy: { createdAt: 'desc' } }); return { items: items.map(mapCollection), pagination: { page: params.page, limit: params.limit, total: items.length, totalPages: 1 } }; }
+export async function getCollectionById(id: string) { const item = await prisma.collection.findUnique({ where: { id }, include: includeCollection }); return item ? mapCollection(item) : null; }
+export async function createCollection(input: CollectionInput) { const item = await prisma.collection.create({ data: { title: input.title, products: { create: input.productIds.map((productId) => ({ product: { connect: { id: productId } } })) }, categories: { create: input.categoryIds.map((categoryId) => ({ category: { connect: { id: categoryId } } })) } }, include: includeCollection }); return mapCollection(item); }
+export async function updateCollection(id: string, input: CollectionUpdateInput) { const existing = await prisma.collection.findUnique({ where: { id } }); if(!existing) return null; const item = await prisma.collection.update({ where: { id }, data: { ...(input.title ? { title: input.title } : {}), ...(input.productIds ? { products: { deleteMany: {}, create: input.productIds.map((productId) => ({ product: { connect: { id: productId } } })) } } : {}), ...(input.categoryIds ? { categories: { deleteMany: {}, create: input.categoryIds.map((categoryId) => ({ category: { connect: { id: categoryId } } })) } } : {}) }, include: includeCollection }); return mapCollection(item); }
+export async function deleteCollection(id: string) { await prisma.collection.delete({ where: { id } }); return { success: true }; }
