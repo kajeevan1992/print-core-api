@@ -186,3 +186,124 @@ model ProductChannel {
   @@id([productId, channelId])
   @@index([channelId])
 }
+
+
+model Tenant {
+  id               String         @id @default(cuid())
+  name             String
+  slug             String         @unique
+  status           String         @default("active")
+  planName         String         @default("Starter")
+  storefrontsUsed  Int            @default(1)
+  storefrontsLimit Int            @default(1)
+  adminUsersUsed   Int            @default(1)
+  adminUsersLimit  Int            @default(3)
+  storageUsedGb    Int            @default(0)
+  storageLimitGb   Int            @default(10)
+  nextBillingDate  DateTime?
+  defaultSubdomain String?
+  primaryDomain    String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  domains          TenantDomain[]
+  orders           Order[]
+}
+
+model TenantDomain {
+  id                 String   @id @default(cuid())
+  tenantId           String
+  hostname           String   @unique
+  type               String
+  isPrimary          Boolean  @default(false)
+  verificationStatus String   @default("pending")
+  sslStatus          String   @default("pending")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  tenant             Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  tenantId      String?
+  orderNumber   String      @unique
+  customerName  String
+  email         String?
+  status        String      @default("artwork-review")
+  totalMinor    Int         @default(0)
+  currency      String      @default("GBP")
+  submittedAt   DateTime    @default(now())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  tenant        Tenant?     @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  items         OrderItem[]
+  artworks      Artwork[]
+
+  @@index([tenantId])
+}
+
+
+model OrderItem {
+  id            String   @id @default(cuid())
+  orderId       String
+  productName   String
+  quantity      Int      @default(1)
+  unitPriceMinor Int     @default(0)
+  lineTotalMinor Int     @default(0)
+  variantLabel  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+model Artwork {
+  id             String   @id @default(cuid())
+  orderId         String?
+  orderReference  String?
+  customerEmail   String?
+  fileName        String
+  fileType        String
+  note            String?
+  status          String   @default("pending-review")
+  source          String   @default("api")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  order           Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([orderReference])
+}
+
+model Material {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  gsm         String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+model Finish {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+model OptionSet {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

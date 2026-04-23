@@ -1,0 +1,12 @@
+API fix v5.1 build stability
+
+- moved build-critical packages into dependencies so Coolify build always has them
+- build-critical packages:
+  - typescript
+  - prisma
+  - @types/node
+  - @types/express
+  - @types/cors
+- updated build script to use local ./node_modules/.bin/tsc explicitly
+- added .npmrc with production=false to reduce production-only install issues
+- preserves all safe-mode endpoints from v5

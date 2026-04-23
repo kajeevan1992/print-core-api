@@ -1,0 +1,6 @@
+API fix v6 real tenant/order models
+
+- Added real Tenant, TenantDomain, and Order Prisma models
+- Added tenant/order seed utility
+- Extended startup init to seed tenant/order demo data
+- Replaced safe-mode tenant/order endpoints with real Prisma-backed endpoints

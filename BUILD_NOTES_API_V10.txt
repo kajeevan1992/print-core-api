@@ -1,0 +1,8 @@
+PASS 1 catalog engine API fix
+
+- Hardened categories, collections, and tags controllers with try/catch and safe empty responses
+- Added fallback queries in categories and collections services to avoid 502s when relation includes fail
+- Added alias mounts:
+  - /tag -> tags router
+  - /options -> option-sets router
+- Keeps existing /tags and /option-sets canonical paths

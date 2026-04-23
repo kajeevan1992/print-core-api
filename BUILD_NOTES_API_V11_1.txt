@@ -1,0 +1,6 @@
+API v11.1 schema/type fix
+
+- Fixed categories.schema.ts so partial() is applied to the base Zod object instead of a transformed schema
+- Kept the tags-based payload shape
+- Fixed implicit any by typing tagId as string in categories.service.ts
+- Intended to resolve the exact TypeScript build errors from the latest Coolify deploy

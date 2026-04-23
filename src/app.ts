@@ -8,6 +8,13 @@ import { collectionsRouter } from './modules/collections/collections.routes';
 import { tagsRouter } from './modules/tags/tags.routes';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { env } from './config/env';
+import devSeedRouter from './routes/dev/seed';
+import tenantsRouter from './routes/tenants';
+import orderStatusRouter from './routes/orders/status';
+import artworkRouter from './routes/artwork';
+import materialsRouter from './routes/materials';
+import finishesRouter from './routes/finishes';
+import optionSetsRouter from './routes/option-sets';
 
 export const app = express();
 
@@ -30,6 +37,15 @@ app.use('/themes', themesRouter);
 app.use('/categories', categoriesRouter);
 app.use('/collections', collectionsRouter);
 app.use('/tags', tagsRouter);
+app.use('/tag', tagsRouter);
+app.use('/dev', devSeedRouter);
+app.use('/tenants', tenantsRouter);
+app.use('/orders', orderStatusRouter);
+app.use('/artwork', artworkRouter);
+app.use('/materials', materialsRouter);
+app.use('/finishes', finishesRouter);
+app.use('/option-sets', optionSetsRouter);
+app.use('/options', optionSetsRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

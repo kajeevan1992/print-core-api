@@ -1,0 +1,7 @@
+API fix v9 safe catalog fix
+
+- Removed duplicate app.ts imports for categories/collections/tags
+- Removed accidental duplicate route folders for categories/collections/tags
+- Added only missing Material/Finish/OptionSet Prisma models
+- Replaced broken catalog meta seed with safe seed for materials/finishes/option sets only
+- Added /materials, /finishes, and /option-sets routes

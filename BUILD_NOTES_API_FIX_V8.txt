@@ -1,0 +1,6 @@
+API fix v8 catalog bulk live endpoints
+
+- Added Category, Collection, Tag, Material, Finish, and OptionSet Prisma models
+- Added seed utility for catalog meta data
+- Mounted new catalog routes in app
+- Added live GET endpoints for categories, collections, tags, materials, finishes, and option sets

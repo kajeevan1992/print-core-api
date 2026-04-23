@@ -1,0 +1,7 @@
+API fix v4
+
+- Added tenants list endpoint
+- Added tenant plan update endpoint
+- Added tenant status update endpoint
+- Added order status update endpoint
+- Mounted routes into app bootstrap

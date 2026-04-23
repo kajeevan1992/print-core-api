@@ -1,0 +1,7 @@
+API fix v7 bulk live endpoints
+
+- Added OrderItem and Artwork Prisma models
+- Expanded orders route with detail and create endpoints
+- Added live artwork CRUD-lite endpoints (list/detail/create/status)
+- Mounted /artwork route in app
+- Extended seed data with order items and artwork records

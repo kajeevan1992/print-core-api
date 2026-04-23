@@ -7,8 +7,18 @@ function getSingleParam(value: string | string[] | undefined): string | null {
 }
 
 export async function getProducts(req: Request, res: Response): Promise<void> {
-  const query = productListQuerySchema.parse(req.query);
-  res.json({ success: true, data: await listProducts(query) });
+  try {
+    const query = productListQuerySchema.parse(req.query);
+    res.json({ success: true, data: await listProducts(query) });
+  } catch (error) {
+    console.error('PRODUCTS_ROUTE_FAILED', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        message: error instanceof Error ? error.message : 'Products query failed',
+      },
+    });
+  }
 }
 
 export async function getProduct(req: Request, res: Response): Promise<void> {

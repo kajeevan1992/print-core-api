@@ -1,0 +1,6 @@
+Unified PASS 2 orders + artwork foundation with tags migration
+
+- Migrated category payloads and category-tags schema/controller to use `tags`
+- Fixed previous TS build failure caused by `labels` vs `tags` mismatch
+- Hardened orders and artwork routes with safe list responses for list endpoints
+- Keeps PASS 1 catalog hardening and endpoint aliases

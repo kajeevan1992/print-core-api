@@ -1,0 +1,7 @@
+API fix v3 auto DB + seed
+
+- Added startup DB initialization via prisma db push
+- Added startup auto-seed when products table is empty
+- Added GET /dev/ping and POST /dev/seed
+- Rebuilt seed against actual Prisma schema
+- Added safer products route error handling

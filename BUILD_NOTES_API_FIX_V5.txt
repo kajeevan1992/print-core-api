@@ -1,0 +1,6 @@
+API fix v5 safe mode build fix
+
+- Replaced prisma.order usage with safe-mode order status response
+- Replaced prisma.tenant usage with safe-mode tenant list/plan/status responses
+- Preserved endpoint contracts so UI wiring stays intact
+- Intended as a temporary bridge until Order and Tenant Prisma models are added
