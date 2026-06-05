@@ -6,6 +6,8 @@ import { themesRouter } from './modules/themes/themes.routes';
 import { categoriesRouter } from './modules/categories/categories.routes';
 import { collectionsRouter } from './modules/collections/collections.routes';
 import { tagsRouter } from './modules/tags/tags.routes';
+import { seoRouter } from './modules/seo/seo.routes';
+import { getLlmsTxt, getRobotsTxt, getSitemapXml } from './modules/seo/seo.controller';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { env } from './config/env';
 import devSeedRouter from './routes/dev/seed';
@@ -31,6 +33,10 @@ app.get('/health', (_req, res) => {
   res.json({ success: true, data: { status: 'ok' } });
 });
 
+app.get('/sitemap.xml', getSitemapXml);
+app.get('/robots.txt', getRobotsTxt);
+app.get('/llms.txt', getLlmsTxt);
+
 app.use('/products', productsRouter);
 app.use('/channels', channelsRouter);
 app.use('/themes', themesRouter);
@@ -38,6 +44,7 @@ app.use('/categories', categoriesRouter);
 app.use('/collections', collectionsRouter);
 app.use('/tags', tagsRouter);
 app.use('/tag', tagsRouter);
+app.use('/seo', seoRouter);
 app.use('/dev', devSeedRouter);
 app.use('/tenants', tenantsRouter);
 app.use('/orders', orderStatusRouter);
